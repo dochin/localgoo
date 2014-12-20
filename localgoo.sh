@@ -16,7 +16,7 @@ if [ -d $PUBLIC_HTML ]; then
 else
 	echo "Creating new public_html directory."
 	mkdir $PUBLIC_HTML
-	echo "<head></head><body>This site uses localgoo to protect your privacy.  Details at https://github.com/dochin/localgoo/</body>" > $PUBLIC_HTML/index.html
+	echo "<head></head><body><h1>localgoo</h1><h2>This site uses localgoo to protect your privacy.  Details at <a href=https://github.com/dochin/localgoo/>https://github.com/dochin/localgoo</a></h2></body>" > $PUBLIC_HTML/index.html
 fi
 
 #create apache2 config if it doesn't exist
