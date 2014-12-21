@@ -47,11 +47,25 @@ script also downloads any files listed in extrafonts.txt.  The format is just
 everything you normally put after 'https://fonts.googleapis.com/?family='
 A few common fonts are included in the file as examples.
 
+Installation Example
+====================
+This is only an example of how to install.  You will need to adjust for your
+operating system/distro and webserver setup.  Possible changes you need to
+make are edit the apache-localgoo.conf file, use a different location, make 
+sure you have permissions, etc.  For the brave, you can avoid permissions
+issues by running as root.
+
+	cd /var/www
+	git clone https://github.com/dochin/localgoo.git
+	cp /var/www/localgoo/apache-localgoo.conf /etc/apache2/conf.d/ #default on debian
+	/etc/init.d/apache2 reload
+
 Usage
 =====
-	localgoo.sh directory_to_clean backup_directory path_to_local_mirror yourwebsite.com
+	./localgoo.sh directory_to_clean backup_directory path_to_local_mirror yourwebsite.com
 	
-This script scrapes the '/directory/to/clean/' for references to google apis
+	Example: ./localgoo.sh /var/www/default /var/www/default.backup /var/www/localgoo/public_html example.com
+This script scrapes the 'directory_to_clean' for references to google apis
 (i.e. fonts and ajax code), downloads a local copy of those references to your
 server, and then replaces the references in the original with new references
 to your local mirror.
@@ -66,3 +80,10 @@ yourwebsite.com is the url of your website root directory.  I.e. example.com
 Your mirrored files will be available at http(s)://example.com/localgoo
 
 Use at your own risk. 
+
+Troubleshooting
+===============
+Using Firefox, open up the inspector toolbar and choose network.  Browse around
+a few pages and see if there are any 404 errors for missing fonts.  If there
+are, add the referer urls to extrafonts.txt.
+	
