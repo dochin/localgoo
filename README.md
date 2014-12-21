@@ -57,6 +57,7 @@ issues by running as root.
 
 	cd /var/www
 	git clone https://github.com/dochin/localgoo.git
+	cd localgoo
 	cp /var/www/localgoo/apache-localgoo.conf /etc/apache2/conf.d/ #default on debian
 	/etc/init.d/apache2 reload
 
