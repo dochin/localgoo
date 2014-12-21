@@ -1,2 +1,4 @@
 Michroma
 Open+Sans+Condensed:300
+Lato:400,400italic,700,700italic|Lato:400|Michroma:400|Michroma:400&subset=latin,latin-ext
+Lato:300&text=X"

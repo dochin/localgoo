@@ -19,46 +19,18 @@ else
 	echo "<head></head><body><h1>localgoo</h1><h2>This site uses localgoo to protect your privacy.  Details at <a href=https://github.com/dochin/localgoo/>https://github.com/dochin/localgoo</a></h2></body>" > $PUBLIC_HTML/index.html
 fi
 
-#create apache2 config if it doesn't exist
-#if [ !`test -f $APACHE_CONF_D_DIR/localgoo` ]; then
-#	echo "<Directory /localgoo>" > $APACHE_CONF_D_DIR/localgoo
-#	echo "Not yet implemented "
-#fi
-
 echo "Searching for files to download..."
 
 #find all calls to google apis in first input
 if [ "$SITE_ROOT" = "" ]; then 
 	echo "Usage: localgoo.sh directory_to_clean backup_directory path_to_local_mirror yourwebsite.com"
 	echo ""
-	echo "This script scrapes the '/directory/to/clean/' for references to google apis"
-	echo "(i.e. fonts and ajax code), downloads a local copy of those references to your"
-	echo "server, and then replaces the references in the original with new references"
-	echo "to your local mirror."
-	echo ""
-	echo "WARNING: This may break your website."
-	echo ""
-	echo "path_to_local_mirror must be accessible on your webserver as /localgoo.  An apache2"
-	echo "config file is included to be placed in conf.d that will create an alias to this"
-	echo "path for you."
-	echo ""
-	echo "yourwebsite.com is the url of your website root directory.  I.e. example.com"
-	echo "Your mirrored files will be available at http(s)://example.com/localgoo"
-	echo ""
-	echo "A backup is required because.  You must have write access to this directory."
-	echo "WARNING: YOUR FILES WILL BE MODIFIED DURING THIS PROCESS."
-	echo ""
-	echo "NOTE: Because some scripts cleverly construct urls to the google apis when used,"
-	echo "rather than hard coding them into css, html, and javascript files, this script"
-	echo "may not be able to determine all the fonts that you need.  As a workaround, the"
-	echo "script also downloads any files listed in extrafonts.txt."
-	echo ""
-	echo "Use at your own risk." 
+	echo "WARNING: This may break your website. Files will be modified.  See README.md"
 
 else
 
 	#Create the backup
-	if [ `cp -R $SEARCH_DIR $BACKUP_DIR` > 0 ]; then
+	if [ `cp -R $SEARCH_DIR $BACKUP_DIR`  ]; then
 		echo "Error creating backup"
 		exit
 	fi
@@ -101,12 +73,15 @@ else
 
 	#combine all the font family files to create a css file
 	cat "$PUBLIC_HTML"/fonts.googleapis.com/*\?* > "$PUBLIC_HTML/fonts.googleapis.com/css"
+	#fix question marks in combined css file
+	sed -i 's/\?/%3f/' "$PUBLIC_HTML/fonts.googleapis.com/css"
 	
 	#replace references in input files with new localgoo using extended regex (-r)
 	for i in `cat files.tmp` ; do sed -i -r \
 		-e "s@('|\"|\()(https://|http://)(ajax|fonts|www)\.googleapis\.com@\1/localgoo/\3.googleapis.com@g" \
 		-e "s@('|\"|\()(://|//)?(ajax|fonts|www)\.googleapis\.com@\1\2$SITE_ROOT/localgoo/\3.googleapis.com@g" \
-		$i; done
+		$i; \
+	done
 
 	#remove temp files
 	rm *.tmp
