@@ -62,9 +62,10 @@ issues by running as root.
 
 Usage
 =====
-	./localgoo.sh directory_to_clean backup_directory path_to_local_mirror yourwebsite.com
+	#Syntax: ./localgoo.sh directory_to_clean backup_directory path_to_local_mirror yourwebsite.com
 	
-	Example: ./localgoo.sh /var/www/default /var/www/default.backup /var/www/localgoo/public_html example.com
+	#Example
+	./localgoo.sh /var/www/default /var/www/default.backup /var/www/localgoo/public_html example.com
 This script scrapes the 'directory_to_clean' for references to google apis
 (i.e. fonts and ajax code), downloads a local copy of those references to your
 server, and then replaces the references in the original with new references
