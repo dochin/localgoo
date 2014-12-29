@@ -54,6 +54,7 @@ goobackup() {
 		git --git-dir="$SEARCH_DIR/.git" --work-tree="$SEARCH_DIR" add .
 		git --git-dir="$SEARCH_DIR/.git" --work-tree="$SEARCH_DIR" commit -a -m "Pre-localgoo backup."
 	fi
+	echo "Backup git commit completed."
 }
 
 goosearch() {
@@ -100,20 +101,23 @@ goosearch() {
 	
 	#Remove temp files
 	cleanup
+	
+	echo "Search completed."
 }
 
 goodownload() {	
 
 	if [ -f "$CONFIG_DIR/download.list" ]; then
-	
-		#Once again check for duplicates
-		sort -u "$CONFIG_DIR/download.list" > download.tmp
-		mv download.tmp "$CONFIG_DIR/download.list"
+		
+		#Check for previous downloads and remove them from the queue.  Also removes dupes
+		#Do download history twice since those all need to get eliminated
+		cat "$CONFIG_DIR/download.list" "$CONFIG_DIR/download_history.list" "$CONFIG_DIR/download_history.list" >> download.tmp
+		sort download.tmp > download2.tmp
+		uniq -u download2.tmp > "$CONFIG_DIR/download.list"
 		
 		#download all the files recursively, span domains, replace links with relative local 
 		echo "Beginning file downloads."	
 		for i in `cat $CONFIG_DIR/download.list` ; do wget -e robots=off --no-verbose -l $WGET_DEPTH -rHk -P $PUBLIC_HTML -D$WGET_DOMAINS "$i";done
-		echo "Downloads complete."
 
 		#combine all the font family files to create a css file
 		cat "$PUBLIC_HTML"/fonts.googleapis.com/*\?* > "$PUBLIC_HTML/fonts.googleapis.com/css"
@@ -128,6 +132,11 @@ goodownload() {
 		sort -u "$CONFIG_DIR/download_history.list" > download_history.tmp
 		mv download_history.tmp "$CONFIG_DIR/download_history.list"
 		
+		#Remove tmp files
+		cleanup
+
+		echo "Downloads complete."
+
 	else
 		echo "Nothing to download.  Try './localgoo.sh init' or './localgoo.sh update' first."
 	fi
@@ -147,11 +156,13 @@ goonukem() {
 
 		for i in `cat $CONFIG_DIR/files.list` ; \
 			do sed -i -r \
-				-e "s@('|\"|\()(https://|http://|://|//)(ajax|fonts|www)\.googleapis\.com@\1\2$SITE_ADDR/localgoo/\3.googleapis.com@g" \
+				-e "s@('|\"|\()(https://|http://|://|//|)(ajax|fonts|www)\.googleapis\.com@\1\2$SITE_ADDR/localgoo/\3.googleapis.com@g" \
 				-e "s@http://$SITE_ADDR@https://$SITE_ADDR@g" \
 				$i; \
 		done
 		rm "$CONFIG_DIR/files.list"
+		
+		echo "Your website files now point to $SITE_ADDR/localgoo instead of google apis."
 
 	else
 		echo "No files to fix.  Try './localgoo.sh init' or './localgoo.sh update' first."
@@ -159,7 +170,7 @@ goonukem() {
 	
 	#Check if you need to download stuff
 	if [ -f "$CONFIG_DIR/download.list" ]; then
-		echo "You have downloads queued.  You may want to run './localgoo.sh download'."
+		echo "WARNING: You have downloads queued.  You may want to run './localgoo.sh download'."
 	fi
 	
 }
@@ -168,13 +179,6 @@ gooupdate() {
 	if [ -f "$CONFIG_FILE" ]; then
 		#Run the search
 		goosearch
-		
-		#Check for previous downloads and remove them from the queue
-		cat "$CONFIG_DIR/download.list" "$CONFIG_DIR/download_history.list" >> download.tmp
-		sort download.tmp > download2.tmp
-		uniq -u download2.tmp > "$CONFIG_DIR/download.list"
-
-		cleanup
 	else
 		echo "No configuration found. Try './localgoo.sh init' first."		
 	fi	
