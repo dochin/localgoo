@@ -50,8 +50,8 @@ goobackup() {
 		git --git-dir="$SEARCH_DIR/.git" --work-tree="$SEARCH_DIR" add .
 		git --git-dir="$SEARCH_DIR/.git" --work-tree="$SEARCH_DIR" commit -a -m "Pre-localgoo backup."
 	else
-		git --git-dir="$SEARCH_DIR/.git" --work-tree="$SEARCH_DIR" add .
 		git --git-dir="$SEARCH_DIR/.git" --work-tree="$SEARCH_DIR" init
+		git --git-dir="$SEARCH_DIR/.git" --work-tree="$SEARCH_DIR" add .
 		git --git-dir="$SEARCH_DIR/.git" --work-tree="$SEARCH_DIR" commit -a -m "Pre-localgoo backup."
 	fi
 }
@@ -111,7 +111,7 @@ goodownload() {
 		mv download.tmp "$CONFIG_DIR/download.list"
 		
 		#download all the files recursively, span domains, replace links with relative local 
-		echo "Beginning file downloads..."	
+		echo "Beginning file downloads."	
 		for i in `cat $CONFIG_DIR/download.list` ; do wget -e robots=off --no-verbose -l $WGET_DEPTH -rHk -P $PUBLIC_HTML -D$WGET_DOMAINS "$i";done
 		echo "Downloads complete."
 
@@ -128,9 +128,6 @@ goodownload() {
 		sort -u "$CONFIG_DIR/download_history.list" > download_history.tmp
 		mv download_history.tmp "$CONFIG_DIR/download_history.list"
 		
-		#Remove temp files
-		cleanup
-		
 	else
 		echo "Nothing to download.  Try './localgoo.sh init' or './localgoo.sh update' first."
 	fi
@@ -138,12 +135,13 @@ goodownload() {
 
 goonukem() {
 	
-	#Check for duplicates
-	sort -u "$CONFIG_DIR/files.list" > files.tmp
-	mv files.tmp "$CONFIG_DIR/files.list"
-	
 	#replace references in input files with new localgoo using extended regex (-r)
 	if [ -f "$CONFIG_DIR/files.list" ]; then
+	
+		#Check for duplicates
+		sort -u "$CONFIG_DIR/files.list" > files.tmp
+		mv files.tmp "$CONFIG_DIR/files.list"
+		
 		#first do a backup
 		goobackup
 
@@ -154,6 +152,7 @@ goonukem() {
 				$i; \
 		done
 		rm "$CONFIG_DIR/files.list"
+
 	else
 		echo "No files to fix.  Try './localgoo.sh init' or './localgoo.sh update' first."
 	fi
@@ -163,8 +162,6 @@ goonukem() {
 		echo "You have downloads queued.  You may want to run './localgoo.sh download'."
 	fi
 	
-	#Remove tmp files
-	cleanup
 }
 
 gooupdate() {
