@@ -28,6 +28,10 @@ and know what you're doing.  This could break your website.
 The script will try to remind you to make a backup, but it may fail without
 stopping.  MAKE YOUR OWN BACKUP FIRST!
 
+GIT IS REQUIRED FOR BACKUP TO WORK.
+This script will initialize a git repo in your www directory and add a
+commit to it any time you make changes to files.
+
 Server Configuration
 ====================
 I've included a file for apache2 to be placed in conf.d that will create an 
